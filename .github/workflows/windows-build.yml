@@ -1,0 +1,43 @@
+name: Build Windows exe
+
+on:
+  push:
+    branches: [main, master, "arena/**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: python -m pip install --upgrade pyinstaller pillow
+
+      - name: Self-test (parsers + fixtures)
+        run: python main.py --selftest
+
+      - name: Generate icon
+        run: python build/png2ico.py assets/icon.png assets/icon.ico
+
+      - name: Build APKDeco.exe
+        run: python -m PyInstaller --clean --noconfirm build/apkdeco.spec
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: APKDeco-windows
+          path: dist/APKDeco.exe
+          if-no-files-found: error
+
+      - name: Attach exe to release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/APKDeco.exe

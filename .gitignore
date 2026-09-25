@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/APKDeco/
+build/dist/
+*.log
+.pytest_cache/
+.mypy_cache/
+.idea/
+.vscode/
+settings.json
+assets/icon.ico
